@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AdminGuard } from "@/components/AdminGuard";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 import { Folder, CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
+import { uploadFile } from "@/lib/upload";
 
 function NewNoteContent() {
   const router = useRouter();
@@ -28,26 +29,7 @@ function NewNoteContent() {
 
   async function uploadPdf(): Promise<{ url: string; filename: string }> {
     if (!file) return { url: "", filename: "" };
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const uploadRes = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!uploadRes.ok) {
-      let msg = "Upload failed";
-      try {
-        const d = await uploadRes.json();
-        msg = d.error || msg;
-      } catch {}
-      throw new Error(msg);
-    }
-
-    const uploadData = await uploadRes.json();
-    return { url: uploadData.url, filename: uploadData.filename };
+    return uploadFile(file, "pdfs");
   }
 
   async function handleSave(asDraft: boolean) {

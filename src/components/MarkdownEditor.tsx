@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { uploadFile } from "@/lib/upload";
 
 export function MarkdownEditor({
   value,
@@ -24,26 +25,7 @@ export function MarkdownEditor({
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch("/api/images/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        let msg = "Upload failed";
-        try {
-          const data = await res.json();
-          msg = data.error || msg;
-        } catch {
-          msg = `Upload failed (${res.status})`;
-        }
-        throw new Error(msg);
-      }
-
-      const { url, filename } = await res.json();
+      const { url, filename } = await uploadFile(file, "images");
       const markdown = `![${filename}](${url})`;
       insertAtCursor(markdown);
     } catch (err) {
