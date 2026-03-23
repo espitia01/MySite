@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const { password } = await request.json();
 
-  if (password !== process.env.ADMIN_PASSWORD) {
+  if (!process.env.ADMIN_PASSWORD || password.trim() !== process.env.ADMIN_PASSWORD.trim()) {
     return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
 
