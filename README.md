@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Notes
+
+A minimalistic website for uploading and sharing PDF notes with markdown explanations. Organize notes into folders and embed images in your explanations.
+
+## Stack
+
+- **Next.js 15** (App Router, TypeScript)
+- **Tailwind CSS** for styling
+- **Supabase** for Postgres database + file storage (PDFs and images)
+- **react-markdown** for rendering explanations
 
 ## Getting Started
 
-First, run the development server:
+### 1. Create a Supabase Project
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Go to [supabase.com](https://supabase.com) and create a free project.
+
+### 2. Create the Database Tables
+
+In the Supabase SQL Editor, run:
+
+```sql
+create table folders (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  description text default '',
+  created_at timestamptz default now()
+);
+
+create table notes (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  category text not null default 'other',
+  description text default '',
+  pdf_url text default '',
+  pdf_filename text default '',
+  folder_id uuid references folders(id),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Create the Storage Buckets
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+In the Supabase dashboard, go to **Storage** and create two public buckets:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **`pdfs`** — for PDF note files
+2. **`images`** — for images inserted into explanations
 
-## Learn More
+For each bucket: click **New Bucket**, enter the name, toggle **Public bucket** ON, and click **Create bucket**.
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Set Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Copy `.env.example` to `.env.local` and fill in your values:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+cp .env.example .env.local
+```
 
-## Deploy on Vercel
+You'll need:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → anon public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role secret key |
+| `ADMIN_PASSWORD` | Any password you choose for the admin panel |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### 6. Deploy to Vercel
+
+1. Push to GitHub
+2. Import the repo in [vercel.com](https://vercel.com)
+3. Add the same environment variables in Vercel project settings
+4. Deploy
+
+## Usage
+
+- **Public site**: browse notes at `/notes`, view folders at `/folders`, view a note at `/notes/[id]`
+- **Admin panel**: go to `/admin`, enter your password, then:
+  - Create/edit/delete notes from the dashboard
+  - Manage folders at `/admin/folders`
+  - Assign notes to folders when creating or editing them
+  - Insert images into explanations via the editor toolbar, drag-and-drop, or paste
