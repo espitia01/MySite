@@ -7,20 +7,14 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("folders")
-    .select("*, notes(count)")
+    .select("*")
     .order("name", { ascending: true });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const folders = (data || []).map((f) => ({
-    ...f,
-    note_count: (f.notes as { count: number }[])?.[0]?.count ?? 0,
-    notes: undefined,
-  }));
-
-  return NextResponse.json(folders);
+  return NextResponse.json(data || []);
 }
 
 export async function POST(request: NextRequest) {

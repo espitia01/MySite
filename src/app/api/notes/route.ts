@@ -6,11 +6,16 @@ export async function GET(request: NextRequest) {
   const supabase = getSupabase();
   const category = request.nextUrl.searchParams.get("category");
   const folderId = request.nextUrl.searchParams.get("folder");
+  const includeDrafts = request.nextUrl.searchParams.get("drafts") === "1";
 
   let query = supabase
     .from("notes")
     .select("*, folders(id, name)")
     .order("created_at", { ascending: false });
+
+  if (!includeDrafts || !isAuthenticatedFromRequest(request)) {
+    query = query.eq("is_draft", false);
+  }
 
   if (category) {
     query = query.eq("category", category);
@@ -46,6 +51,7 @@ export async function POST(request: NextRequest) {
       pdf_url: body.pdf_url || "",
       pdf_filename: body.pdf_filename || "",
       folder_id: body.folder_id || null,
+      is_draft: body.is_draft ?? false,
     })
     .select("*, folders(id, name)")
     .single();

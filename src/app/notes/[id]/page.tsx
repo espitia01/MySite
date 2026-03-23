@@ -14,6 +14,7 @@ async function getNote(id: string): Promise<NoteWithFolder | null> {
     .from("notes")
     .select("*, folders(id, name)")
     .eq("id", id)
+    .eq("is_draft", false)
     .single();
   return data as NoteWithFolder | null;
 }

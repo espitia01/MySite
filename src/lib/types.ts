@@ -13,6 +13,7 @@ export interface Note {
   pdf_url: string;
   pdf_filename: string;
   folder_id: string | null;
+  is_draft: boolean;
   created_at: string;
   updated_at: string;
 }

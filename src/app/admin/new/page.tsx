@@ -1,20 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AdminGuard } from "@/components/AdminGuard";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 import { Folder, CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
-
-const DRAFT_KEY = "note-draft-new";
-
-interface Draft {
-  title: string;
-  category: string;
-  folderId: string;
-  description: string;
-}
 
 function NewNoteContent() {
   const router = useRouter();
@@ -24,86 +15,50 @@ function NewNoteContent() {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [draftLoaded, setDraftLoaded] = useState(false);
-  const [draftSaved, setDraftSaved] = useState(false);
 
   useEffect(() => {
     fetch("/api/folders")
       .then((res) => res.json())
       .then(setFolders)
       .catch(() => {});
-
-    try {
-      const raw = localStorage.getItem(DRAFT_KEY);
-      if (raw) {
-        const draft: Draft = JSON.parse(raw);
-        setTitle(draft.title || "");
-        setCategory(draft.category || "textbook");
-        setFolderId(draft.folderId || "");
-        setDescription(draft.description || "");
-      }
-    } catch {}
-    setDraftLoaded(true);
   }, []);
 
-  const saveDraft = useCallback(() => {
-    const draft: Draft = { title, category, folderId, description };
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-      setDraftSaved(true);
-      setTimeout(() => setDraftSaved(false), 1500);
-    } catch {}
-  }, [title, category, folderId, description]);
+  async function uploadPdf(): Promise<{ url: string; filename: string }> {
+    if (!file) return { url: "", filename: "" };
 
-  useEffect(() => {
-    if (!draftLoaded) return;
-    const timer = setTimeout(() => {
-      if (title || description) {
-        try {
-          localStorage.setItem(
-            DRAFT_KEY,
-            JSON.stringify({ title, category, folderId, description })
-          );
-        } catch {}
-      }
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [title, category, folderId, description, draftLoaded]);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  function clearDraft() {
-    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    const uploadRes = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!uploadRes.ok) {
+      let msg = "Upload failed";
+      try {
+        const d = await uploadRes.json();
+        msg = d.error || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    const uploadData = await uploadRes.json();
+    return { url: uploadData.url, filename: uploadData.filename };
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSave(asDraft: boolean) {
     setError("");
-    setSubmitting(true);
+    if (asDraft) setSaving(true);
+    else setSubmitting(true);
 
     try {
-      let pdfUrl = "";
-      let pdfFilename = "";
+      if (!title.trim()) throw new Error("Title is required");
 
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const uploadRes = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          let msg = "Upload failed";
-          try { const d = await uploadRes.json(); msg = d.error || msg; } catch {}
-          throw new Error(msg);
-        }
-
-        const uploadData = await uploadRes.json();
-        pdfUrl = uploadData.url;
-        pdfFilename = uploadData.filename;
-      }
+      const { url: pdfUrl, filename: pdfFilename } = await uploadPdf();
 
       const noteRes = await fetch("/api/notes", {
         method: "POST",
@@ -115,21 +70,25 @@ function NewNoteContent() {
           pdf_url: pdfUrl,
           pdf_filename: pdfFilename,
           folder_id: folderId || null,
+          is_draft: asDraft,
         }),
       });
 
       if (!noteRes.ok) {
         let msg = "Failed to create note";
-        try { const d = await noteRes.json(); msg = d.error || msg; } catch {}
+        try {
+          const d = await noteRes.json();
+          msg = d.error || msg;
+        } catch {}
         throw new Error(msg);
       }
 
-      clearDraft();
       router.push("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setSubmitting(false);
+      setSaving(false);
     }
   }
 
@@ -142,23 +101,20 @@ function NewNoteContent() {
         &larr; Back to dashboard
       </Link>
 
-      <div className="mt-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">New Note</h1>
-          <p className="mt-1 text-sm text-muted">
-            Upload a PDF and write an explanation.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={saveDraft}
-          className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:text-foreground"
-        >
-          {draftSaved ? "Saved!" : "Save draft"}
-        </button>
+      <div className="mt-6">
+        <h1 className="text-2xl font-bold tracking-tight">New Note</h1>
+        <p className="mt-1 text-sm text-muted">
+          Upload a PDF and write an explanation.
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave(false);
+        }}
+        className="mt-8 space-y-6"
+      >
         <div>
           <label htmlFor="title" className="mb-1.5 block text-sm font-medium">
             Title
@@ -175,7 +131,10 @@ function NewNoteContent() {
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label htmlFor="category" className="mb-1.5 block text-sm font-medium">
+            <label
+              htmlFor="category"
+              className="mb-1.5 block text-sm font-medium"
+            >
               Category
             </label>
             <select
@@ -185,12 +144,17 @@ function NewNoteContent() {
               className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
             >
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
+                <option key={cat} value={cat}>
+                  {CATEGORY_LABELS[cat]}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="folder" className="mb-1.5 block text-sm font-medium">
+            <label
+              htmlFor="folder"
+              className="mb-1.5 block text-sm font-medium"
+            >
               Folder
             </label>
             <select
@@ -201,7 +165,9 @@ function NewNoteContent() {
             >
               <option value="">No folder</option>
               {folders.map((f) => (
-                <option key={f.id} value={f.id}>{f.name}</option>
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
               ))}
             </select>
           </div>
@@ -221,23 +187,38 @@ function NewNoteContent() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium">Explanation</label>
+          <label className="mb-1.5 block text-sm font-medium">
+            Explanation
+          </label>
           <MarkdownEditor value={description} onChange={setDescription} />
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
+          <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
+            {error}
+          </p>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || saving}
             className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {submitting ? "Creating..." : "Create Note"}
+            {submitting ? "Publishing..." : "Publish"}
           </button>
-          <Link href="/admin/dashboard" className="text-sm text-muted hover:text-foreground">
+          <button
+            type="button"
+            disabled={submitting || saving}
+            onClick={() => handleSave(true)}
+            className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:text-foreground disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save as Draft"}
+          </button>
+          <Link
+            href="/admin/dashboard"
+            className="text-sm text-muted hover:text-foreground"
+          >
             Cancel
           </Link>
         </div>

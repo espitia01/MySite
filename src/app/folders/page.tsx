@@ -10,16 +10,28 @@ interface FolderWithCount extends Folder {
 
 async function getFolders(): Promise<FolderWithCount[]> {
   const supabase = getSupabase();
-  const { data } = await supabase
-    .from("folders")
-    .select("*, notes(count)")
-    .order("name", { ascending: true });
+  const [foldersResult, notesResult] = await Promise.all([
+    supabase.from("folders").select("*").order("name", { ascending: true }),
+    supabase
+      .from("notes")
+      .select("folder_id")
+      .eq("is_draft", false)
+      .not("folder_id", "is", null),
+  ]);
 
-  return (data || []).map((f) => ({
+  const folders = foldersResult.data || [];
+  const notes = notesResult.data || [];
+  const countMap = new Map<string, number>();
+  notes.forEach((n) => {
+    if (n.folder_id) {
+      countMap.set(n.folder_id, (countMap.get(n.folder_id) || 0) + 1);
+    }
+  });
+
+  return folders.map((f) => ({
     ...f,
-    note_count: (f.notes as { count: number }[])?.[0]?.count ?? 0,
-    notes: undefined,
-  })) as FolderWithCount[];
+    note_count: countMap.get(f.id) || 0,
+  }));
 }
 
 export default async function FoldersPage() {

@@ -3,7 +3,7 @@ import { getSupabase } from "@/lib/supabase";
 import { isAuthenticatedFromRequest } from "@/lib/auth";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -16,6 +16,10 @@ export async function GET(
     .single();
 
   if (error) {
+    return NextResponse.json({ error: "Note not found" }, { status: 404 });
+  }
+
+  if (data.is_draft && !isAuthenticatedFromRequest(request)) {
     return NextResponse.json({ error: "Note not found" }, { status: 404 });
   }
 
@@ -43,6 +47,7 @@ export async function PUT(
       pdf_url: body.pdf_url,
       pdf_filename: body.pdf_filename,
       folder_id: body.folder_id || null,
+      is_draft: body.is_draft ?? false,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

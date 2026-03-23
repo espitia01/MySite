@@ -17,8 +17,8 @@ export function MarkdownEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleImageUpload(file: File) {
-    if (file.size > 8 * 1024 * 1024) {
-      alert("Image must be under 8 MB");
+    if (file.size > 16 * 1024 * 1024) {
+      alert("Image must be under 16 MB");
       return;
     }
 

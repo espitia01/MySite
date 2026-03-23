@@ -11,6 +11,7 @@ async function getNotes(category?: string): Promise<NoteWithFolder[]> {
   let query = supabase
     .from("notes")
     .select("*, folders(id, name)")
+    .eq("is_draft", false)
     .order("created_at", { ascending: false });
 
   if (category && CATEGORIES.includes(category as Category)) {

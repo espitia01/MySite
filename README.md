@@ -35,6 +35,7 @@ create table notes (
   pdf_url text default '',
   pdf_filename text default '',
   folder_id uuid references folders(id),
+  is_draft boolean default false,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -82,6 +83,14 @@ Open [http://localhost:3000](http://localhost:3000).
 3. Add the same environment variables in Vercel project settings
 4. Deploy
 
+### Existing Database Migration
+
+If you already have the `notes` table, add the `is_draft` column:
+
+```sql
+alter table notes add column is_draft boolean default false;
+```
+
 ## Usage
 
 - **Public site**: browse notes at `/notes`, view folders at `/folders`, view a note at `/notes/[id]`
@@ -90,3 +99,4 @@ Open [http://localhost:3000](http://localhost:3000).
   - Manage folders at `/admin/folders`
   - Assign notes to folders when creating or editing them
   - Insert images into explanations via the editor toolbar, drag-and-drop, or paste
+  - Save notes as drafts (visible only to admin) and publish when ready
