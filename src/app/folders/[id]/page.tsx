@@ -22,6 +22,7 @@ async function getFolderNotes(folderId: string): Promise<NoteWithFolder[]> {
     .from("notes")
     .select("*, folders(id, name)")
     .eq("folder_id", folderId)
+    .eq("is_draft", false)
     .order("created_at", { ascending: false });
   return (data as NoteWithFolder[]) || [];
 }

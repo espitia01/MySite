@@ -3,27 +3,19 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getSupabase } from "@/lib/supabase";
-import { isAuthenticated } from "@/lib/auth";
 import { NoteWithFolder, CATEGORY_LABELS } from "@/lib/types";
 import { PDFViewer } from "@/components/PDFViewer";
+import { DraftBanner } from "@/components/DraftBanner";
 
 export const dynamic = "force-dynamic";
 
-async function getNote(
-  id: string,
-  admin: boolean
-): Promise<NoteWithFolder | null> {
+async function getNote(id: string): Promise<NoteWithFolder | null> {
   const supabase = getSupabase();
-  let query = supabase
+  const { data } = await supabase
     .from("notes")
     .select("*, folders(id, name)")
-    .eq("id", id);
-
-  if (!admin) {
-    query = query.eq("is_draft", false);
-  }
-
-  const { data } = await query.single();
+    .eq("id", id)
+    .single();
   return data as NoteWithFolder | null;
 }
 
@@ -33,11 +25,14 @@ export default async function NoteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const admin = await isAuthenticated();
-  const note = await getNote(id, admin);
+  const note = await getNote(id);
 
   if (!note) {
     notFound();
+  }
+
+  if (note.is_draft) {
+    return <DraftBanner noteId={note.id} note={note} />;
   }
 
   const date = new Date(note.created_at).toLocaleDateString("en-US", {
@@ -60,11 +55,6 @@ export default async function NoteDetailPage({
           <span className="rounded-full bg-card border border-border px-2.5 py-0.5 text-xs font-medium text-muted">
             {CATEGORY_LABELS[note.category]}
           </span>
-          {note.is_draft && (
-            <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-              Draft
-            </span>
-          )}
           {note.folders && (
             <Link
               href={`/folders/${note.folders.id}`}
@@ -74,14 +64,6 @@ export default async function NoteDetailPage({
             </Link>
           )}
           <span className="text-sm text-muted">{date}</span>
-          {admin && note.is_draft && (
-            <Link
-              href={`/admin/edit/${note.id}`}
-              className="text-sm font-medium text-accent hover:underline"
-            >
-              Edit draft
-            </Link>
-          )}
         </div>
         <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
           {note.title}
