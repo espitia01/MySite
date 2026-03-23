@@ -9,7 +9,7 @@ export function Header() {
           <CoffeeMugIcon className="h-5 w-5 sm:h-6 sm:w-6" />
           Giovanny Espitia&apos;s Notes
         </Link>
-        <nav className="flex items-center gap-4 text-sm sm:gap-6">
+        <nav className="flex items-center gap-3 text-sm sm:gap-6">
           <Link
             href="/notes"
             className="text-muted transition-colors hover:text-foreground"
@@ -21,6 +21,12 @@ export function Header() {
             className="text-muted transition-colors hover:text-foreground"
           >
             Folders
+          </Link>
+          <Link
+            href="/about"
+            className="text-muted transition-colors hover:text-foreground"
+          >
+            About
           </Link>
         </nav>
       </div>

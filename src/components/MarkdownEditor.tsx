@@ -17,6 +17,11 @@ export function MarkdownEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleImageUpload(file: File) {
+    if (file.size > 8 * 1024 * 1024) {
+      alert("Image must be under 8 MB");
+      return;
+    }
+
     setUploading(true);
     try {
       const formData = new FormData();
@@ -28,32 +33,44 @@ export function MarkdownEditor({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Upload failed");
+        let msg = "Upload failed";
+        try {
+          const data = await res.json();
+          msg = data.error || msg;
+        } catch {
+          msg = `Upload failed (${res.status})`;
+        }
+        throw new Error(msg);
       }
 
       const { url, filename } = await res.json();
       const markdown = `![${filename}](${url})`;
-
-      const textarea = textareaRef.current;
-      if (textarea) {
-        const start = textarea.selectionStart;
-        const before = value.slice(0, start);
-        const after = value.slice(textarea.selectionEnd);
-        const newValue = before + markdown + after;
-        onChange(newValue);
-        requestAnimationFrame(() => {
-          textarea.selectionStart = textarea.selectionEnd =
-            start + markdown.length;
-          textarea.focus();
-        });
-      } else {
-        onChange(value + "\n" + markdown);
-      }
+      insertAtCursor(markdown);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Image upload failed");
     } finally {
       setUploading(false);
+    }
+  }
+
+  function insertAtCursor(text: string) {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const before = value.slice(0, start);
+      const after = value.slice(end);
+      const needsNewline = before.length > 0 && !before.endsWith("\n");
+      const insert = (needsNewline ? "\n" : "") + text;
+      const newValue = before + insert + after;
+      onChange(newValue);
+      const cursorPos = start + insert.length;
+      requestAnimationFrame(() => {
+        textarea.selectionStart = textarea.selectionEnd = cursorPos;
+        textarea.focus();
+      });
+    } else {
+      onChange(value + (value && !value.endsWith("\n") ? "\n" : "") + text);
     }
   }
 
