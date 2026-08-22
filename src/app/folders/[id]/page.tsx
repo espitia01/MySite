@@ -42,29 +42,36 @@ export default async function FolderDetailPage({
   const notes = await getFolderNotes(id);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <Link
         href="/folders"
-        className="text-sm text-muted hover:text-foreground"
+        className="text-sm text-muted transition-colors hover:text-foreground"
       >
         &larr; All folders
       </Link>
 
       <div className="mt-6">
-        <h1 className="text-3xl font-bold tracking-tight">{folder.name}</h1>
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Folder
+        </p>
+        <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+          {folder.name}
+        </h1>
         {folder.description && (
-          <p className="mt-2 text-muted">{folder.description}</p>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
+            {folder.description}
+          </p>
         )}
       </div>
 
       {notes.length > 0 ? (
-        <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {notes.map((note) => (
             <NoteCard key={note.id} note={note} />
           ))}
         </div>
       ) : (
-        <div className="mt-16 text-center">
+        <div className="surface mt-12 px-6 py-16 text-center">
           <p className="text-muted">No notes in this folder yet.</p>
         </div>
       )}

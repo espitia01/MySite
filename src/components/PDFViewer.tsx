@@ -1,20 +1,20 @@
 export function PDFViewer({ url, filename }: { url: string; filename: string }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
-      <div className="flex items-center justify-between border-b border-border bg-card px-3 py-2 sm:px-4 sm:py-2.5">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_1px_2px_rgba(26,24,20,0.03)]">
+      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
         <span className="truncate text-sm text-muted">{filename}</span>
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 text-sm font-medium text-foreground underline underline-offset-2 hover:text-muted"
+          className="shrink-0 text-sm font-medium text-accent underline-offset-4 hover:underline"
         >
           Open PDF
         </a>
       </div>
       <iframe
         src={url}
-        className="h-[50vh] w-full sm:h-[70vh]"
+        className="h-[50vh] w-full bg-paper/40 sm:h-[70vh]"
         title={filename}
       />
     </div>

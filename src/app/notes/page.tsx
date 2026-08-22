@@ -3,6 +3,7 @@ import { getSupabase } from "@/lib/supabase";
 import { NoteWithFolder, Category, CATEGORIES } from "@/lib/types";
 import { NoteCard } from "@/components/NoteCard";
 import { CategoryFilter } from "@/components/CategoryFilter";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +32,12 @@ export default async function NotesPage({
   const notes = await getNotes(category);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <h1 className="text-3xl font-bold tracking-tight">All Notes</h1>
-      <p className="mt-2 text-muted">
-        Browse notes by category or scroll through everything.
-      </p>
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+      <PageHeader
+        eyebrow="Library"
+        title="All notes"
+        description="Browse by category, or scroll through the full collection."
+      />
 
       <div className="mt-8">
         <Suspense>
@@ -44,14 +46,17 @@ export default async function NotesPage({
       </div>
 
       {notes.length > 0 ? (
-        <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {notes.map((note) => (
             <NoteCard key={note.id} note={note} />
           ))}
         </div>
       ) : (
-        <div className="mt-16 text-center">
-          <p className="text-muted">No notes found.</p>
+        <div className="surface mt-12 px-6 py-16 text-center">
+          <p className="font-serif text-lg">No notes found</p>
+          <p className="mt-1 text-sm text-muted">
+            Try another category, or check back soon.
+          </p>
         </div>
       )}
     </div>

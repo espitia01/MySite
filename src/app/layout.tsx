@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import "./globals.css";
@@ -12,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,22 +34,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="flex min-h-full flex-col font-sans">
         <Header />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-border py-8 text-center text-sm text-muted">
-          <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 sm:flex-row sm:justify-between sm:px-6">
-            <span>
-              &copy; {new Date().getFullYear()} Giovanny Espitia
-            </span>
-            <Link
-              href="/admin"
-              className="text-muted/50 transition-colors hover:text-muted"
-            >
-              Admin
-            </Link>
+        <footer className="mt-8 border-t border-border/80 py-10 text-sm text-muted">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 sm:flex-row sm:justify-between sm:px-6">
+            <p>
+              <span className="font-serif text-foreground">
+                Giovanny Espitia
+              </span>
+              <span className="mx-2 text-border">·</span>
+              Notes &amp; explanations
+            </p>
+            <div className="flex items-center gap-5">
+              <span>&copy; {new Date().getFullYear()}</span>
+              <Link
+                href="/admin"
+                className="text-muted/60 transition-colors hover:text-muted"
+              >
+                Admin
+              </Link>
+            </div>
           </div>
         </footer>
       </body>

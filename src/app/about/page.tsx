@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 export default function AboutPage() {
   return (
@@ -10,11 +9,14 @@ export default function AboutPage() {
           alt="Giovanny Espitia"
           width={160}
           height={160}
-          className="shrink-0 rounded-full object-cover"
+          className="shrink-0 rounded-full object-cover ring-4 ring-paper"
           priority
         />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-highlight">
+            About
+          </p>
+          <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
             Giovanny Espitia
           </h1>
           <p className="mt-2 text-muted">
@@ -26,7 +28,7 @@ export default function AboutPage() {
           <p className="mt-1 text-sm text-muted">
             Advisor: Mit H. Naik &middot; Dean&apos;s Strategic Fellow
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
             <a
               href="mailto:gespitia3@utexas.edu"
               className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
@@ -65,22 +67,29 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <hr className="my-10 border-border" />
+      <hr className="my-12 border-border" />
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted">Education</h2>
-        <div className="mt-4 space-y-4">
+        <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Education
+        </h2>
+        <div className="mt-5 space-y-5">
           <div>
-            <p className="font-medium">The University of Texas at Austin</p>
+            <p className="font-serif text-lg font-semibold">
+              The University of Texas at Austin
+            </p>
             <p className="text-sm text-muted">
               Ph.D. in Physics &middot; 2024 &ndash; Present
             </p>
             <p className="mt-1 text-sm text-muted">
-              Dean&apos;s Strategic Fellow &mdash; sole recipient in the Department of Physics
+              Dean&apos;s Strategic Fellow &mdash; sole recipient in the
+              Department of Physics
             </p>
           </div>
           <div>
-            <p className="font-medium">Georgia Institute of Technology</p>
+            <p className="font-serif text-lg font-semibold">
+              Georgia Institute of Technology
+            </p>
             <p className="text-sm text-muted">
               B.S. in Physics, Highest Honors &middot; 2021 &ndash; 2024
             </p>
@@ -88,29 +97,43 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <hr className="my-10 border-border" />
+      <hr className="my-12 border-border" />
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted">Selected Publications</h2>
-        <ol className="mt-4 space-y-3 text-sm leading-relaxed">
+        <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Selected Publications
+        </h2>
+        <ol className="mt-5 list-decimal space-y-3 pl-5 text-sm leading-relaxed">
           <li>
-            <span className="font-medium">G. Espitia</span>, S.H. Lee, et al., &ldquo;Taco flat bands at a magic twist angle in bilayer transition metal dichalcogenides.&rdquo;
+            <span className="font-medium">G. Espitia</span>, S.H. Lee, et al.,
+            &ldquo;Taco flat bands at a magic twist angle in bilayer transition
+            metal dichalcogenides.&rdquo;
             <span className="text-muted"> Submitted to PRL, 2025</span>
           </li>
           <li>
-            C. Shi, Y. Li, Y. Jiang, Y. Luo, <span className="font-medium">G. Espitia</span>, et al., &ldquo;Electron Ptychography Reveals Layer-Resolved Picometer-Scale Relaxation in Large-Angle Moiré.&rdquo;
+            C. Shi, Y. Li, Y. Jiang, Y. Luo,{" "}
+            <span className="font-medium">G. Espitia</span>, et al.,
+            &ldquo;Electron Ptychography Reveals Layer-Resolved Picometer-Scale
+            Relaxation in Large-Angle Moiré.&rdquo;
             <span className="text-muted"> Science (in review), 2025</span>
           </li>
           <li>
-            Z. Liu, <span className="font-medium">G. Espitia</span>, et al., &ldquo;Giant intervalley exciton absorption in a large twist-angle semiconductor bilayer.&rdquo;
+            Z. Liu, <span className="font-medium">G. Espitia</span>, et al.,
+            &ldquo;Giant intervalley exciton absorption in a large twist-angle
+            semiconductor bilayer.&rdquo;
             <span className="text-muted"> Nature (in review), 2025</span>
           </li>
           <li>
-            Z. Liu, Q. Gao, Y. Li, <span className="font-medium">G. Espitia</span>, et al., &ldquo;Field-Tunable Valley Coupling in a Dodecagonal Semiconductor Quasicrystal.&rdquo;
+            Z. Liu, Q. Gao, Y. Li,{" "}
+            <span className="font-medium">G. Espitia</span>, et al.,
+            &ldquo;Field-Tunable Valley Coupling in a Dodecagonal Semiconductor
+            Quasicrystal.&rdquo;
             <span className="text-muted"> Nature Physics, 2025</span>
           </li>
           <li>
-            <span className="font-medium">G. Espitia</span>, Y.T. Pang, J.C. Gumbart, &ldquo;Protein Structure Prediction Using Deep Reinforcement Learning in the 3D HP Model.&rdquo;
+            <span className="font-medium">G. Espitia</span>, Y.T. Pang, J.C.
+            Gumbart, &ldquo;Protein Structure Prediction Using Deep
+            Reinforcement Learning in the 3D HP Model.&rdquo;
             <span className="text-muted"> arXiv:2412.20329, 2024</span>
           </li>
         </ol>
@@ -118,56 +141,81 @@ export default function AboutPage() {
           href="/aboutMe/EspitiaGiovannyCV.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-4 hover:text-muted"
+          className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent underline-offset-4 hover:underline"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4"><path fillRule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm2.25 8.5a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5zm0 3a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" clipRule="evenodd" /></svg>
           Full CV (PDF) &rarr;
         </a>
       </section>
 
-      <hr className="my-10 border-border" />
+      <hr className="my-12 border-border" />
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted">Awards</h2>
-        <ul className="mt-4 space-y-2 text-sm">
-          <li>Antoniewicz Endowed Presidential Fellowship in Condensed Matter Physics <span className="text-muted">(2025)</span></li>
-          <li>Dean&apos;s Strategic Fellowship, UT Austin Dept. of Physics <span className="text-muted">(2024&ndash;2025)</span></li>
-          <li>Faculty Honors Award, Georgia Tech <span className="text-muted">(2021&ndash;2024)</span></li>
-          <li>First-Year Research Scholarship, Kennesaw State University <span className="text-muted">(2020&ndash;2021)</span></li>
+        <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Awards
+        </h2>
+        <ul className="mt-5 space-y-2.5 text-sm">
+          <li>
+            Antoniewicz Endowed Presidential Fellowship in Condensed Matter
+            Physics <span className="text-muted">(2025)</span>
+          </li>
+          <li>
+            Dean&apos;s Strategic Fellowship, UT Austin Dept. of Physics{" "}
+            <span className="text-muted">(2024&ndash;2025)</span>
+          </li>
+          <li>
+            Faculty Honors Award, Georgia Tech{" "}
+            <span className="text-muted">(2021&ndash;2024)</span>
+          </li>
+          <li>
+            First-Year Research Scholarship, Kennesaw State University{" "}
+            <span className="text-muted">(2020&ndash;2021)</span>
+          </li>
         </ul>
       </section>
 
-      <hr className="my-10 border-border" />
+      <hr className="my-12 border-border" />
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted">Software</h2>
-        <div className="mt-4">
+        <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Software
+        </h2>
+        <div className="surface mt-5 p-5">
           <a
             href="https://twisterase.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium underline underline-offset-4 hover:text-muted"
+            className="font-serif text-lg font-semibold text-accent underline-offset-4 hover:underline"
           >
             TwisterASE
           </a>
-          <p className="mt-1 text-sm text-muted">
-            A Python toolkit for generating twisted layered material structures (graphene, hBN, TMDs) and producing ready-to-run LAMMPS input files for molecular dynamics simulations.
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            A Python toolkit for generating twisted layered material structures
+            (graphene, hBN, TMDs) and producing ready-to-run LAMMPS input files
+            for molecular dynamics simulations.
           </p>
         </div>
       </section>
 
-      <hr className="my-10 border-border" />
+      <hr className="my-12 border-border" />
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted">Skills &amp; Languages</h2>
-        <div className="mt-4 space-y-2 text-sm">
+        <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Skills &amp; Languages
+        </h2>
+        <div className="mt-5 space-y-2 text-sm">
           <p>
             <span className="font-medium">Programming:</span>{" "}
-            <span className="text-muted">Python, Julia, MATLAB, PyTorch, C++, CUDA, High-Performance Computing</span>
+            <span className="text-muted">
+              Python, Julia, MATLAB, PyTorch, C++, CUDA, High-Performance
+              Computing
+            </span>
           </p>
           <p>
             <span className="font-medium">Languages:</span>{" "}
-            <span className="text-muted">English (native), Spanish (fluent)</span>
+            <span className="text-muted">
+              English (native), Spanish (fluent)
+            </span>
           </p>
         </div>
       </section>

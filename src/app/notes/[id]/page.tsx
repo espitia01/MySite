@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { getSupabase } from "@/lib/supabase";
 import { NoteWithFolder, CATEGORY_LABELS } from "@/lib/types";
 import { PDFViewer } from "@/components/PDFViewer";
 import { DraftBanner } from "@/components/DraftBanner";
+import { Markdown } from "@/components/Markdown";
+import { Badge } from "@/components/Badge";
+import { readingMinutes } from "@/lib/markdown";
 
 export const dynamic = "force-dynamic";
 
@@ -40,35 +41,34 @@ export default async function NoteDetailPage({
     month: "long",
     day: "numeric",
   });
+  const minutes = note.description ? readingMinutes(note.description) : 0;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
       <Link
         href="/notes"
-        className="text-sm text-muted hover:text-foreground"
+        className="text-sm text-muted transition-colors hover:text-foreground"
       >
         &larr; Back to notes
       </Link>
 
-      <div className="mt-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-card border border-border px-2.5 py-0.5 text-xs font-medium text-muted">
-            {CATEGORY_LABELS[note.category]}
-          </span>
+      <header className="mt-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge>{CATEGORY_LABELS[note.category]}</Badge>
           {note.folders && (
-            <Link
-              href={`/folders/${note.folders.id}`}
-              className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted transition-colors hover:border-muted hover:text-foreground"
-            >
-              {note.folders.name}
+            <Link href={`/folders/${note.folders.id}`}>
+              <Badge variant="outline">{note.folders.name}</Badge>
             </Link>
           )}
           <span className="text-sm text-muted">{date}</span>
+          {minutes > 0 && (
+            <span className="text-sm text-muted">· {minutes} min read</span>
+          )}
         </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
           {note.title}
         </h1>
-      </div>
+      </header>
 
       {note.pdf_url && (
         <div className="mt-8">
@@ -77,17 +77,13 @@ export default async function NoteDetailPage({
       )}
 
       {note.description && (
-        <div className="mt-10">
-          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
+        <div className="mt-12">
+          <h2 className="mb-5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
             Explanation
           </h2>
-          <div className="prose">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {note.description}
-            </ReactMarkdown>
-          </div>
+          <Markdown>{note.description}</Markdown>
         </div>
       )}
-    </div>
+    </article>
   );
 }

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { NoteWithFolder, CATEGORY_LABELS } from "@/lib/types";
 import { PDFViewer } from "@/components/PDFViewer";
+import { Markdown } from "@/components/Markdown";
+import { Badge } from "@/components/Badge";
+import { readingMinutes } from "@/lib/markdown";
 
 export function DraftBanner({
   noteId,
@@ -21,9 +22,7 @@ export function DraftBanner({
   useEffect(() => {
     fetch("/api/auth")
       .then((res) => res.json())
-      .then((data) =>
-        setStatus(data.authenticated ? "admin" : "denied")
-      )
+      .then((data) => setStatus(data.authenticated ? "admin" : "denied"))
       .catch(() => setStatus("denied"));
   }, []);
 
@@ -38,7 +37,7 @@ export function DraftBanner({
   if (status === "denied") {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2">
-        <h1 className="text-2xl font-bold">404</h1>
+        <h1 className="font-serif text-3xl font-semibold">404</h1>
         <p className="text-muted">This page could not be found.</p>
         <Link href="/" className="mt-2 text-sm underline underline-offset-4">
           Go home
@@ -52,14 +51,18 @@ export function DraftBanner({
     month: "long",
     day: "numeric",
   });
+  const minutes = note.description ? readingMinutes(note.description) : 0;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
-      <Link href="/notes" className="text-sm text-muted hover:text-foreground">
+    <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+      <Link
+        href="/notes"
+        className="text-sm text-muted transition-colors hover:text-foreground"
+      >
         &larr; Back to notes
       </Link>
 
-      <div className="mt-4 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+      <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
         This note is a draft and only visible to you.{" "}
         <Link
           href={`/admin/edit/${noteId}`}
@@ -69,25 +72,22 @@ export function DraftBanner({
         </Link>
       </div>
 
-      <div className="mt-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-card border border-border px-2.5 py-0.5 text-xs font-medium text-muted">
-            {CATEGORY_LABELS[note.category]}
-          </span>
-          <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-            Draft
-          </span>
+      <header className="mt-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge>{CATEGORY_LABELS[note.category]}</Badge>
+          <Badge variant="draft">Draft</Badge>
           {note.folders && (
-            <span className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">
-              {note.folders.name}
-            </span>
+            <Badge variant="outline">{note.folders.name}</Badge>
           )}
           <span className="text-sm text-muted">{date}</span>
+          {minutes > 0 && (
+            <span className="text-sm text-muted">· {minutes} min read</span>
+          )}
         </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
           {note.title}
         </h1>
-      </div>
+      </header>
 
       {note.pdf_url && (
         <div className="mt-8">
@@ -96,17 +96,13 @@ export function DraftBanner({
       )}
 
       {note.description && (
-        <div className="mt-10">
-          <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
+        <div className="mt-12">
+          <h2 className="mb-5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
             Explanation
           </h2>
-          <div className="prose">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {note.description}
-            </ReactMarkdown>
-          </div>
+          <Markdown>{note.description}</Markdown>
         </div>
       )}
-    </div>
+    </article>
   );
 }

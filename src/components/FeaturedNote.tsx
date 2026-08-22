@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { NoteWithFolder, CATEGORY_LABELS } from "@/lib/types";
+import { excerptFromMarkdown } from "@/lib/markdown";
+import { Badge } from "@/components/Badge";
 
 export function FeaturedNote({ note }: { note: NoteWithFolder }) {
   const date = new Date(note.created_at).toLocaleDateString("en-US", {
@@ -7,37 +9,34 @@ export function FeaturedNote({ note }: { note: NoteWithFolder }) {
     month: "long",
     day: "numeric",
   });
+  const excerpt = excerptFromMarkdown(note.description || "", 280);
 
   return (
     <Link
       href={`/notes/${note.id}`}
-      className="group block rounded-xl border border-border bg-card p-6 transition-colors hover:border-muted sm:p-8"
+      className="surface surface-hover group relative block overflow-hidden p-6 sm:p-8"
     >
-      <span className="text-xs font-medium uppercase tracking-wider text-muted">
-        Latest
-      </span>
-      <h2 className="mt-3 text-xl font-bold leading-snug tracking-tight group-hover:text-accent sm:text-2xl">
+      <div className="absolute inset-y-0 left-0 w-1 bg-accent" />
+      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-highlight">
+        Latest note
+      </p>
+      <h2 className="mt-3 font-serif text-2xl font-semibold leading-snug tracking-tight group-hover:text-accent sm:text-3xl">
         {note.title}
       </h2>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-background px-2.5 py-0.5 text-xs font-medium text-muted">
-          {CATEGORY_LABELS[note.category]}
-        </span>
-        {note.folders && (
-          <span className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">
-            {note.folders.name}
-          </span>
-        )}
+        <Badge>{CATEGORY_LABELS[note.category]}</Badge>
+        {note.folders && <Badge variant="outline">{note.folders.name}</Badge>}
+        {note.pdf_url && <Badge variant="outline">PDF</Badge>}
         <span className="text-xs text-muted">{date}</span>
       </div>
-      {note.description && (
-        <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted sm:text-base sm:leading-relaxed">
-          {note.description.slice(0, 300)}
-          {note.description.length > 300 ? "..." : ""}
+      {excerpt && (
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-[15px]">
+          {excerpt}
         </p>
       )}
-      <span className="mt-4 inline-block text-sm font-medium underline underline-offset-4 group-hover:text-muted">
-        Read more &rarr;
+      <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-accent">
+        Read note
+        <span aria-hidden="true">&rarr;</span>
       </span>
     </Link>
   );

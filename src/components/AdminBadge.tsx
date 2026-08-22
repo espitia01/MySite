@@ -18,7 +18,7 @@ export function AdminBadge() {
   return (
     <Link
       href="/admin/dashboard"
-      className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent transition-colors hover:bg-accent/20"
+      className="ml-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-medium tracking-wide text-white transition-colors hover:bg-accent-hover"
     >
       Admin
     </Link>

@@ -56,42 +56,47 @@ export default async function Home() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6">
-      <section className="py-12 sm:py-20">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <section className="py-14 sm:py-20">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-highlight">
+          Physics notes
+        </p>
+        <h1 className="mt-3 max-w-2xl font-serif text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
           Giovanny Espitia&apos;s Notes
         </h1>
-        <p className="mt-3 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
-          A collection of textbook notes, paper notes, lecture summaries, and
-          explanations. Browse freely.
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+          Textbook notes, papers, lecture summaries, and worked explanations
+          from theoretical and computational condensed matter physics.
         </p>
-        <div className="mt-6 flex flex-wrap gap-4">
-          <Link
-            href="/notes"
-            className="inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-4 hover:text-muted"
-          >
-            Browse all notes &rarr;
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/notes" className="btn btn-primary">
+            Browse all notes
           </Link>
-          <Link
-            href="/folders"
-            className="inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-4 hover:text-muted"
-          >
-            View folders &rarr;
+          <Link href="/folders" className="btn btn-secondary">
+            View folders
           </Link>
         </div>
       </section>
 
       {featured && (
-        <section className="pb-12 sm:pb-16">
+        <section className="pb-14 sm:pb-16">
           <FeaturedNote note={featured} />
         </section>
       )}
 
       {folders.length > 0 && (
-        <section className="pb-12 sm:pb-16">
-          <h2 className="mb-6 text-sm font-medium uppercase tracking-wider text-muted">
-            Folders
-          </h2>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="pb-14 sm:pb-16">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <h2 className="font-serif text-xl font-semibold tracking-tight">
+              Folders
+            </h2>
+            <Link
+              href="/folders"
+              className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline"
+            >
+              All folders
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {folders.map((folder) => (
               <FolderCard key={folder.id} folder={folder} />
             ))}
@@ -101,10 +106,18 @@ export default async function Home() {
 
       {rest.length > 0 && (
         <section className="pb-16 sm:pb-20">
-          <h2 className="mb-6 text-sm font-medium uppercase tracking-wider text-muted">
-            Recent
-          </h2>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <h2 className="font-serif text-xl font-semibold tracking-tight">
+              Recent
+            </h2>
+            <Link
+              href="/notes"
+              className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline"
+            >
+              All notes
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rest.map((note) => (
               <NoteCard key={note.id} note={note} />
             ))}

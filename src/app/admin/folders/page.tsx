@@ -20,13 +20,19 @@ function FoldersContent() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchFolders();
+    fetch("/api/folders")
+      .then((res) => res.json())
+      .then((data) => {
+        setFolders(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   async function fetchFolders() {
     const res = await fetch("/api/folders");
     const data = await res.json();
-    setFolders(data);
+    setFolders(Array.isArray(data) ? data : []);
     setLoading(false);
   }
 
@@ -86,33 +92,35 @@ function FoldersContent() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <Link
         href="/admin/dashboard"
-        className="text-sm text-muted hover:text-foreground"
+        className="text-sm text-muted transition-colors hover:text-foreground"
       >
         &larr; Back to dashboard
       </Link>
 
-      <h1 className="mt-6 text-2xl font-bold tracking-tight">Folders</h1>
-      <p className="mt-1 text-sm text-muted">
+      <h1 className="mt-6 font-serif text-3xl font-semibold tracking-tight">
+        Folders
+      </h1>
+      <p className="mt-2 text-sm text-muted">
         Create and manage folders to organize your notes.
       </p>
 
-      <form onSubmit={handleCreate} className="mt-8 space-y-3">
+      <form onSubmit={handleCreate} className="surface mt-8 space-y-3 p-5">
         <div className="flex gap-3">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Folder name"
-            className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
+            className="field flex-1"
             required
           />
           <button
             type="submit"
             disabled={submitting}
-            className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="btn btn-primary shrink-0"
           >
             Create
           </button>
@@ -122,62 +130,57 @@ function FoldersContent() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description (optional)"
-          className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
+          className="field"
         />
       </form>
 
       {loading ? (
-        <p className="mt-12 text-center text-sm text-muted">
-          Loading folders...
-        </p>
+        <p className="mt-12 text-center text-sm text-muted">Loading folders...</p>
       ) : folders.length === 0 ? (
         <p className="mt-12 text-center text-muted">No folders yet.</p>
       ) : (
-        <div className="mt-8 space-y-2">
+        <div className="mt-8 space-y-3">
           {folders.map((folder) => (
-            <div
-              key={folder.id}
-              className="rounded-lg border border-border p-4"
-            >
+            <div key={folder.id} className="surface p-4">
               {editingId === folder.id ? (
                 <div className="space-y-2">
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-foreground"
+                    className="field"
                   />
                   <input
                     type="text"
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     placeholder="Description"
-                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-foreground"
+                    className="field"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleUpdate(folder.id)}
                       disabled={submitting}
-                      className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50"
+                      className="btn btn-primary"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
-                      className="text-xs text-muted hover:text-foreground"
+                      className="btn btn-ghost"
                     >
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="font-medium">{folder.name}</p>
+                    <p className="font-serif text-lg font-semibold">
+                      {folder.name}
+                    </p>
                     <p className="text-sm text-muted">
-                      {folder.description
-                        ? `${folder.description} · `
-                        : ""}
+                      {folder.description ? `${folder.description} · ` : ""}
                       {folder.note_count}{" "}
                       {folder.note_count === 1 ? "note" : "notes"}
                     </p>
@@ -191,7 +194,7 @@ function FoldersContent() {
                     </button>
                     <button
                       onClick={() => handleDelete(folder.id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-danger hover:underline"
                     >
                       Delete
                     </button>

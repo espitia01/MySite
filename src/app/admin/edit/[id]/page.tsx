@@ -5,6 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { AdminGuard } from "@/components/AdminGuard";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
+import { PdfField } from "@/components/PdfField";
+import { Badge } from "@/components/Badge";
 import { Folder, NoteWithFolder, CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
 import { uploadFile } from "@/lib/upload";
 
@@ -33,7 +35,7 @@ function EditNoteContent() {
       fetch("/api/folders").then((r) => r.json()),
     ])
       .then(([note, foldersData]: [NoteWithFolder, Folder[]]) => {
-        setFolders(foldersData);
+        setFolders(Array.isArray(foldersData) ? foldersData : []);
         setTitle(note.title);
         setCategory(note.category);
         setFolderId(note.folder_id || "");
@@ -105,21 +107,19 @@ function EditNoteContent() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <Link
         href="/admin/dashboard"
-        className="text-sm text-muted hover:text-foreground"
+        className="text-sm text-muted transition-colors hover:text-foreground"
       >
         &larr; Back to dashboard
       </Link>
 
-      <div className="mt-6 flex items-center gap-3">
-        <h1 className="text-2xl font-bold tracking-tight">Edit Note</h1>
-        {isDraft && (
-          <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-            Draft
-          </span>
-        )}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">
+          Edit note
+        </h1>
+        {isDraft && <Badge variant="draft">Draft</Badge>}
       </div>
 
       <form
@@ -138,24 +138,21 @@ function EditNoteContent() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
+            className="field"
             required
           />
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label
-              htmlFor="category"
-              className="mb-1.5 block text-sm font-medium"
-            >
+            <label htmlFor="category" className="mb-1.5 block text-sm font-medium">
               Category
             </label>
             <select
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
+              className="field"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -165,17 +162,14 @@ function EditNoteContent() {
             </select>
           </div>
           <div>
-            <label
-              htmlFor="folder"
-              className="mb-1.5 block text-sm font-medium"
-            >
+            <label htmlFor="folder" className="mb-1.5 block text-sm font-medium">
               Folder
             </label>
             <select
               id="folder"
               value={folderId}
               onChange={(e) => setFolderId(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
+              className="field"
             >
               <option value="">No folder</option>
               {folders.map((f) => (
@@ -187,38 +181,19 @@ function EditNoteContent() {
           </div>
         </div>
 
-        <div>
-          <label htmlFor="pdf" className="mb-1.5 block text-sm font-medium">
-            PDF File
-          </label>
-          {currentPdfFilename && (
-            <p className="mb-2 text-sm text-muted">
-              Current: {currentPdfFilename}
-            </p>
-          )}
-          <input
-            id="pdf"
-            type="file"
-            accept=".pdf"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="w-full text-sm text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-card file:px-3 file:py-2 file:text-sm file:font-medium file:text-foreground hover:file:bg-background"
-          />
-          {currentPdfFilename && (
-            <p className="mt-1 text-xs text-muted">
-              Leave empty to keep the current PDF.
-            </p>
-          )}
-        </div>
+        <PdfField
+          file={file}
+          onFile={setFile}
+          currentFilename={currentPdfFilename}
+        />
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium">
-            Explanation
-          </label>
+          <label className="mb-1.5 block text-sm font-medium">Explanation</label>
           <MarkdownEditor value={description} onChange={setDescription} />
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
+          <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-danger">
             {error}
           </p>
         )}
@@ -229,7 +204,7 @@ function EditNoteContent() {
               <button
                 type="submit"
                 disabled={submitting || saving}
-                className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="btn btn-primary"
               >
                 {submitting ? "Publishing..." : "Publish"}
               </button>
@@ -237,24 +212,21 @@ function EditNoteContent() {
                 type="button"
                 disabled={submitting || saving}
                 onClick={() => handleSave(true)}
-                className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:text-foreground disabled:opacity-50"
+                className="btn btn-secondary"
               >
-                {saving ? "Saving..." : "Save Draft"}
+                {saving ? "Saving..." : "Save draft"}
               </button>
             </>
           ) : (
             <button
               type="submit"
               disabled={submitting || saving}
-              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="btn btn-primary"
             >
-              {submitting ? "Saving..." : "Save Changes"}
+              {submitting ? "Saving..." : "Save changes"}
             </button>
           )}
-          <Link
-            href="/admin/dashboard"
-            className="text-sm text-muted hover:text-foreground"
-          >
+          <Link href="/admin/dashboard" className="btn btn-ghost">
             Cancel
           </Link>
         </div>

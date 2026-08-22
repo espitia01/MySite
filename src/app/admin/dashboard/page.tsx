@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AdminGuard } from "@/components/AdminGuard";
 import { NoteWithFolder, CATEGORY_LABELS } from "@/lib/types";
+import { Badge } from "@/components/Badge";
 
 function DashboardContent() {
   const router = useRouter();
@@ -15,7 +16,7 @@ function DashboardContent() {
     fetch("/api/notes?drafts=1")
       .then((res) => res.json())
       .then((data) => {
-        setNotes(data);
+        setNotes(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -61,25 +62,24 @@ function DashboardContent() {
   const published = notes.filter((n) => !n.is_draft);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="mt-1 text-sm text-muted">
-            Manage your notes and uploads.
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+            Workspace
+          </p>
+          <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight">
+            Dashboard
+          </h1>
+          <p className="mt-2 text-sm text-muted">
+            Create, edit, and publish notes.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href="/admin/new"
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-          >
-            New Note
+          <Link href="/admin/new" className="btn btn-primary">
+            New note
           </Link>
-          <button
-            onClick={handleLogout}
-            className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
-          >
+          <button onClick={handleLogout} className="btn btn-secondary">
             Sign out
           </button>
         </div>
@@ -88,7 +88,7 @@ function DashboardContent() {
       <div className="mt-6">
         <Link
           href="/admin/folders"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted underline underline-offset-4 hover:text-foreground"
+          className="text-sm font-medium text-accent underline-offset-4 hover:underline"
         >
           Manage folders &rarr;
         </Link>
@@ -99,11 +99,11 @@ function DashboardContent() {
           <p className="text-sm text-muted">Loading notes...</p>
         </div>
       ) : notes.length === 0 ? (
-        <div className="mt-16 text-center">
-          <p className="text-muted">No notes yet.</p>
+        <div className="surface mt-12 px-6 py-16 text-center">
+          <p className="font-serif text-lg">No notes yet</p>
           <Link
             href="/admin/new"
-            className="mt-2 inline-block text-sm font-medium underline underline-offset-4"
+            className="mt-3 inline-block text-sm font-medium text-accent underline-offset-4 hover:underline"
           >
             Create your first note
           </Link>
@@ -111,29 +111,27 @@ function DashboardContent() {
       ) : (
         <>
           {drafts.length > 0 && (
-            <div className="mt-8">
-              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
-                Drafts ({drafts.length})
+            <div className="mt-10">
+              <h2 className="mb-4 font-serif text-lg font-semibold">
+                Drafts{" "}
+                <span className="text-muted">({drafts.length})</span>
               </h2>
-              <div className="overflow-x-auto">
-                <NoteTable
-                  notes={drafts}
-                  onDelete={handleDelete}
-                  onPublish={handlePublish}
-                  showPublish
-                />
-              </div>
+              <NoteTable
+                notes={drafts}
+                onDelete={handleDelete}
+                onPublish={handlePublish}
+                showPublish
+              />
             </div>
           )}
 
           {published.length > 0 && (
-            <div className="mt-8">
-              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
-                Published ({published.length})
+            <div className="mt-10">
+              <h2 className="mb-4 font-serif text-lg font-semibold">
+                Published{" "}
+                <span className="text-muted">({published.length})</span>
               </h2>
-              <div className="overflow-x-auto">
-                <NoteTable notes={published} onDelete={handleDelete} />
-              </div>
+              <NoteTable notes={published} onDelete={handleDelete} />
             </div>
           )}
         </>
@@ -154,66 +152,68 @@ function NoteTable({
   showPublish?: boolean;
 }) {
   return (
-    <table className="w-full text-left text-sm">
-      <thead>
-        <tr className="border-b border-border text-muted">
-          <th className="pb-3 font-medium">Title</th>
-          <th className="pb-3 font-medium">Category</th>
-          <th className="pb-3 font-medium">Folder</th>
-          <th className="pb-3 font-medium">Date</th>
-          <th className="pb-3 text-right font-medium">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {notes.map((note) => (
-          <tr key={note.id} className="border-b border-border">
-            <td className="py-3 pr-4">
-              <Link
-                href={`/admin/edit/${note.id}`}
-                className="font-medium hover:underline"
-              >
-                {note.title}
-              </Link>
-            </td>
-            <td className="py-3 pr-4 text-muted">
-              {CATEGORY_LABELS[note.category]}
-            </td>
-            <td className="py-3 pr-4 text-muted">
-              {note.folders?.name || "\u2014"}
-            </td>
-            <td className="py-3 pr-4 whitespace-nowrap text-muted">
-              {new Date(note.created_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </td>
-            <td className="py-3 text-right whitespace-nowrap">
-              {showPublish && onPublish && (
-                <button
-                  onClick={() => onPublish(note)}
-                  className="text-green-600 hover:text-green-800"
-                >
-                  Publish
-                </button>
-              )}
-              <Link
-                href={`/admin/edit/${note.id}`}
-                className="ml-4 text-muted hover:text-foreground"
-              >
-                Edit
-              </Link>
-              <button
-                onClick={() => onDelete(note.id)}
-                className="ml-4 text-red-500 hover:text-red-700"
-              >
-                Delete
-              </button>
-            </td>
+    <div className="surface overflow-x-auto">
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-border text-[11px] uppercase tracking-[0.12em] text-muted">
+            <th className="px-4 py-3 font-medium">Title</th>
+            <th className="px-4 py-3 font-medium">Category</th>
+            <th className="px-4 py-3 font-medium">Folder</th>
+            <th className="px-4 py-3 font-medium">Date</th>
+            <th className="px-4 py-3 text-right font-medium">Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {notes.map((note) => (
+            <tr key={note.id} className="border-b border-border last:border-0">
+              <td className="px-4 py-3 pr-4">
+                <Link
+                  href={`/admin/edit/${note.id}`}
+                  className="font-medium hover:text-accent"
+                >
+                  {note.title}
+                </Link>
+              </td>
+              <td className="px-4 py-3 pr-4">
+                <Badge>{CATEGORY_LABELS[note.category]}</Badge>
+              </td>
+              <td className="px-4 py-3 pr-4 text-muted">
+                {note.folders?.name || "\u2014"}
+              </td>
+              <td className="whitespace-nowrap px-4 py-3 pr-4 text-muted">
+                {new Date(note.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </td>
+              <td className="whitespace-nowrap px-4 py-3 text-right">
+                {showPublish && onPublish && (
+                  <button
+                    onClick={() => onPublish(note)}
+                    className="text-sm text-accent hover:underline"
+                  >
+                    Publish
+                  </button>
+                )}
+                <Link
+                  href={`/admin/edit/${note.id}`}
+                  className="ml-4 text-sm text-muted hover:text-foreground"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() => onDelete(note.id)}
+                  className="ml-4 text-sm text-danger hover:underline"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

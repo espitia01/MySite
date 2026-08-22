@@ -16,31 +16,29 @@ export function CategoryFilter() {
     }
   }
 
+  const options = [
+    { id: "all", label: "All" },
+    ...CATEGORIES.map((cat) => ({ id: cat, label: CATEGORY_LABELS[cat] })),
+  ];
+
   return (
     <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => handleFilter("all")}
-        className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-          active === "all"
-            ? "bg-accent text-white"
-            : "bg-card border border-border text-muted hover:text-foreground"
-        }`}
-      >
-        All
-      </button>
-      {CATEGORIES.map((cat) => (
-        <button
-          key={cat}
-          onClick={() => handleFilter(cat)}
-          className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-            active === cat
-              ? "bg-accent text-white"
-              : "bg-card border border-border text-muted hover:text-foreground"
-          }`}
-        >
-          {CATEGORY_LABELS[cat]}
-        </button>
-      ))}
+      {options.map((option) => {
+        const isActive = active === option.id;
+        return (
+          <button
+            key={option.id}
+            onClick={() => handleFilter(option.id)}
+            className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+              isActive
+                ? "bg-accent text-white"
+                : "border border-border bg-card text-muted hover:border-muted hover:text-foreground"
+            }`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

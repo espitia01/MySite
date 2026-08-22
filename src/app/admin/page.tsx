@@ -49,19 +49,21 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
+    <div className="flex min-h-[60vh] items-center justify-center px-6 py-12">
+      <div className="surface w-full max-w-sm p-7">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+          Private
+        </p>
+        <h1 className="mt-2 font-serif text-2xl font-semibold tracking-tight">
+          Admin
+        </h1>
         <p className="mt-1 text-sm text-muted">
           Enter the password to manage notes.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-7 space-y-4">
           <div>
-            <label
-              htmlFor="password"
-              className="mb-1.5 block text-sm font-medium"
-            >
+            <label htmlFor="password" className="mb-1.5 block text-sm font-medium">
               Password
             </label>
             <input
@@ -69,17 +71,14 @@ export default function AdminLoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none transition-colors focus:border-foreground"
+              className="field"
               required
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-          >
+          <button type="submit" className="btn btn-primary w-full">
             Sign in
           </button>
         </form>
