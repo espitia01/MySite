@@ -1,37 +1,22 @@
 import Link from "next/link";
-import { CoffeeMugIcon } from "@/components/CoffeeMugIcon";
 import { AdminBadge } from "@/components/AdminBadge";
+import { NavLink } from "@/components/NavLink";
+import { SITE } from "@/lib/site";
 
 export function Header() {
   return (
-    <header className="border-b border-border">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-6 px-5 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 text-base font-semibold tracking-tight sm:text-lg"
+          className="font-serif text-[1.0625rem] font-semibold tracking-tight transition-colors hover:text-link"
         >
-          <CoffeeMugIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-          Giovanny Espitia&apos;s Notes
+          {SITE.name}
         </Link>
-        <nav className="flex items-center gap-3 text-sm sm:gap-6">
-          <Link
-            href="/notes"
-            className="text-muted transition-colors hover:text-foreground"
-          >
-            Browse
-          </Link>
-          <Link
-            href="/folders"
-            className="text-muted transition-colors hover:text-foreground"
-          >
-            Folders
-          </Link>
-          <Link
-            href="/about"
-            className="text-muted transition-colors hover:text-foreground"
-          >
-            About
-          </Link>
+        <nav className="flex items-center gap-5 text-sm sm:gap-7">
+          <NavLink href="/notes">Notes</NavLink>
+          <NavLink href="/folders">Folders</NavLink>
+          <NavLink href="/about">About</NavLink>
           <AdminBadge />
         </nav>
       </div>

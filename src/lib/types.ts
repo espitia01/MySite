@@ -32,3 +32,10 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   lecture: "Lectures",
   other: "Other",
 };
+
+export const CATEGORY_SINGULAR: Record<Category, string> = {
+  textbook: "Textbook",
+  paper: "Paper",
+  lecture: "Lecture",
+  other: "Note",
+};

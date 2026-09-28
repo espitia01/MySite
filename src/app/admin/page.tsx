@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">Admin</h1>
         <p className="mt-1 text-sm text-muted">
           Enter the password to manage notes.
         </p>
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="w-full rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             Sign in
           </button>

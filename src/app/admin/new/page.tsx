@@ -84,7 +84,7 @@ function NewNoteContent() {
       </Link>
 
       <div className="mt-6">
-        <h1 className="text-2xl font-bold tracking-tight">New Note</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">New Note</h1>
         <p className="mt-1 text-sm text-muted">
           Upload a PDF and write an explanation.
         </p>
@@ -185,7 +185,7 @@ function NewNoteContent() {
           <button
             type="submit"
             disabled={submitting || saving}
-            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {submitting ? "Publishing..." : "Publish"}
           </button>

@@ -1,30 +1,21 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getSupabase } from "@/lib/supabase";
-import { Folder, NoteWithFolder } from "@/lib/types";
-import { NoteCard } from "@/components/NoteCard";
+import { getFolder, getPublishedNotes } from "@/lib/queries";
+import { NoteList } from "@/components/NoteList";
+import { EmptyState, PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
-async function getFolder(id: string): Promise<Folder | null> {
-  const supabase = getSupabase();
-  const { data } = await supabase
-    .from("folders")
-    .select("*")
-    .eq("id", id)
-    .single();
-  return data as Folder | null;
-}
-
-async function getFolderNotes(folderId: string): Promise<NoteWithFolder[]> {
-  const supabase = getSupabase();
-  const { data } = await supabase
-    .from("notes")
-    .select("*, folders(id, name)")
-    .eq("folder_id", folderId)
-    .eq("is_draft", false)
-    .order("created_at", { ascending: false });
-  return (data as NoteWithFolder[]) || [];
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const folder = await getFolder((await params).id);
+  return folder
+    ? { title: folder.name, description: folder.description || undefined }
+    : {};
 }
 
 export default async function FolderDetailPage({
@@ -34,39 +25,30 @@ export default async function FolderDetailPage({
 }) {
   const { id } = await params;
   const folder = await getFolder(id);
+  if (!folder) notFound();
 
-  if (!folder) {
-    notFound();
-  }
-
-  const notes = await getFolderNotes(id);
+  const notes = await getPublishedNotes({ folderId: id });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <Link
-        href="/folders"
-        className="text-sm text-muted hover:text-foreground"
+    <div className="mx-auto max-w-3xl px-5 sm:px-6">
+      <PageHeader
+        breadcrumb={
+          <Link href="/folders" className="transition-colors hover:text-foreground">
+            &larr; Folders
+          </Link>
+        }
+        title={folder.name}
+        description={folder.description || undefined}
       >
-        &larr; All folders
-      </Link>
-
-      <div className="mt-6">
-        <h1 className="text-3xl font-bold tracking-tight">{folder.name}</h1>
-        {folder.description && (
-          <p className="mt-2 text-muted">{folder.description}</p>
-        )}
-      </div>
+        <p className="mt-4 font-mono text-xs text-subtle">
+          {notes.length} {notes.length === 1 ? "note" : "notes"}
+        </p>
+      </PageHeader>
 
       {notes.length > 0 ? (
-        <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} />
-          ))}
-        </div>
+        <NoteList notes={notes} groupByYear showFolder={false} />
       ) : (
-        <div className="mt-16 text-center">
-          <p className="text-muted">No notes in this folder yet.</p>
-        </div>
+        <EmptyState>No notes in this folder yet.</EmptyState>
       )}
     </div>
   );

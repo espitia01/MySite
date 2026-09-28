@@ -94,7 +94,7 @@ function FoldersContent() {
         &larr; Back to dashboard
       </Link>
 
-      <h1 className="mt-6 text-2xl font-bold tracking-tight">Folders</h1>
+      <h1 className="mt-6 font-serif text-3xl font-semibold tracking-tight">Folders</h1>
       <p className="mt-1 text-sm text-muted">
         Create and manage folders to organize your notes.
       </p>
@@ -112,7 +112,7 @@ function FoldersContent() {
           <button
             type="submit"
             disabled={submitting}
-            className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="shrink-0 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             Create
           </button>
@@ -158,7 +158,7 @@ function FoldersContent() {
                     <button
                       onClick={() => handleUpdate(folder.id)}
                       disabled={submitting}
-                      className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50"
+                      className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50"
                     >
                       Save
                     </button>

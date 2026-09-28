@@ -1,26 +1,16 @@
-import { Suspense } from "react";
-import { getSupabase } from "@/lib/supabase";
-import { NoteWithFolder, Category, CATEGORIES } from "@/lib/types";
-import { NoteCard } from "@/components/NoteCard";
-import { CategoryFilter } from "@/components/CategoryFilter";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { getPublishedNotes } from "@/lib/queries";
+import { Category, CATEGORIES, CATEGORY_LABELS } from "@/lib/types";
+import { NoteList } from "@/components/NoteList";
+import { EmptyState, PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
-async function getNotes(category?: string): Promise<NoteWithFolder[]> {
-  const supabase = getSupabase();
-  let query = supabase
-    .from("notes")
-    .select("*, folders(id, name)")
-    .eq("is_draft", false)
-    .order("created_at", { ascending: false });
-
-  if (category && CATEGORIES.includes(category as Category)) {
-    query = query.eq("category", category);
-  }
-
-  const { data } = await query;
-  return (data as NoteWithFolder[]) || [];
-}
+export const metadata: Metadata = {
+  title: "Notes",
+  description: "All notes on textbooks, papers, and lectures.",
+};
 
 export default async function NotesPage({
   searchParams,
@@ -28,31 +18,56 @@ export default async function NotesPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
-  const notes = await getNotes(category);
+  const active = CATEGORIES.includes(category as Category) ? (category as Category) : null;
+
+  const all = await getPublishedNotes();
+  const notes = active ? all.filter((n) => n.category === active) : all;
+  const tabs = [
+    { key: null, label: "All", count: all.length },
+    ...CATEGORIES.map((c) => ({
+      key: c,
+      label: CATEGORY_LABELS[c],
+      count: all.filter((n) => n.category === c).length,
+    })).filter((t) => t.count > 0 || t.key === active),
+  ];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <h1 className="text-3xl font-bold tracking-tight">All Notes</h1>
-      <p className="mt-2 text-muted">
-        Browse notes by category or scroll through everything.
-      </p>
+    <div className="mx-auto max-w-3xl px-5 sm:px-6">
+      <PageHeader
+        title="Notes"
+        description={`${all.length} ${all.length === 1 ? "note" : "notes"} on textbooks, papers, and lectures, newest first.`}
+      />
 
-      <div className="mt-8">
-        <Suspense>
-          <CategoryFilter />
-        </Suspense>
-      </div>
+      <nav aria-label="Filter by category" className="mb-10 border-b border-border">
+        <ul className="-mb-px flex gap-6 overflow-x-auto text-sm">
+          {tabs.map((tab) => {
+            const selected = tab.key === active;
+            return (
+              <li key={tab.label}>
+                <Link
+                  href={tab.key ? `/notes?category=${tab.key}` : "/notes"}
+                  aria-current={selected ? "page" : undefined}
+                  className={`inline-flex items-baseline gap-1.5 whitespace-nowrap border-b-2 pb-3 transition-colors ${
+                    selected
+                      ? "border-foreground text-foreground"
+                      : "border-transparent text-muted hover:text-foreground"
+                  }`}
+                >
+                  {tab.label}
+                  <span className="font-mono text-[0.6875rem] tabular-nums text-subtle">
+                    {tab.count}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
 
       {notes.length > 0 ? (
-        <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} />
-          ))}
-        </div>
+        <NoteList notes={notes} groupByYear />
       ) : (
-        <div className="mt-16 text-center">
-          <p className="text-muted">No notes found.</p>
-        </div>
+        <EmptyState>No notes in this category yet.</EmptyState>
       )}
     </div>
   );

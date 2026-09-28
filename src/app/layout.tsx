@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
+import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { SITE } from "@/lib/site";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +16,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
-  title: "Giovanny Espitia's Notes",
-  description:
-    "A collection of textbook notes, paper notes, lecture summaries, and explanations.",
+  title: {
+    default: SITE.title,
+    template: `%s · ${SITE.name}`,
+  },
+  description: SITE.description,
+  openGraph: {
+    siteName: SITE.name,
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -28,24 +42,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="flex min-h-full flex-col font-sans">
         <Header />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-border py-8 text-center text-sm text-muted">
-          <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-4 sm:flex-row sm:justify-between sm:px-6">
-            <span>
-              &copy; {new Date().getFullYear()} Giovanny Espitia
-            </span>
-            <Link
-              href="/admin"
-              className="text-muted/50 transition-colors hover:text-muted"
-            >
-              Admin
-            </Link>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

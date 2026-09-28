@@ -64,7 +64,7 @@ function DashboardContent() {
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="font-serif text-3xl font-semibold tracking-tight">Dashboard</h1>
           <p className="mt-1 text-sm text-muted">
             Manage your notes and uploads.
           </p>
@@ -72,7 +72,7 @@ function DashboardContent() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/new"
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             New Note
           </Link>
@@ -112,7 +112,7 @@ function DashboardContent() {
         <>
           {drafts.length > 0 && (
             <div className="mt-8">
-              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
+              <h2 className="mb-3 font-serif text-lg font-semibold tracking-tight">
                 Drafts ({drafts.length})
               </h2>
               <div className="overflow-x-auto">
@@ -128,7 +128,7 @@ function DashboardContent() {
 
           {published.length > 0 && (
             <div className="mt-8">
-              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
+              <h2 className="mb-3 font-serif text-lg font-semibold tracking-tight">
                 Published ({published.length})
               </h2>
               <div className="overflow-x-auto">

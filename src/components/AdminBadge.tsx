@@ -18,8 +18,9 @@ export function AdminBadge() {
   return (
     <Link
       href="/admin/dashboard"
-      className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent transition-colors hover:bg-accent/20"
+      className="inline-flex items-center gap-1.5 rounded border border-border px-2 py-0.5 text-xs text-muted transition-colors hover:border-subtle hover:text-foreground"
     >
+      <span className="h-1.5 w-1.5 rounded-full bg-link" aria-hidden />
       Admin
     </Link>
   );
